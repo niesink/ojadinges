@@ -401,7 +401,7 @@ async function loadPlaylists() {
       <img src="${p.images && p.images[0] ? p.images[0].url : ''}" alt="">
       <div class="pl-info">
         <div class="pl-name">${esc(p.name)}</div>
-        <div class="pl-count">${p.tracks.total} nummers</div>
+        <div class="pl-count">${p.tracks ? p.tracks.total : '?'} nummers</div>
       </div>
     </div>`
   ).join('') + '</div>';
