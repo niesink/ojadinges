@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raad de Intro</title>
+<style>
+:root {
+  --bg: #0a0a1a; --surface: #151530; --surface2: #1e1e40;
+  --accent: #1DB954; --accent2: #1ed760; --text: #fff; --text2: #a0a0c0;
+  --danger: #e74c3c; --gold: #f1c40f; --silver: #bdc3c7; --bronze: #cd7f32;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:560px;margin:0 auto;padding:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:50px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#000}.btn-primary:hover{background:var(--accent2);transform:scale(1.03)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid #333}.btn-secondary:hover{background:#2a2a50}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-small{padding:8px 16px;font-size:13px}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.card{background:var(--surface);border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #222244}
+input[type="text"],input[type="number"]{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #333;background:var(--surface2);color:var(--text);font-size:15px;outline:none}
+input:focus{border-color:var(--accent)}
+.screen{display:none;animation:fadeIn .3s ease}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.login-area{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:75vh;text-align:center}
+.login-area .logo{font-size:64px;margin-bottom:12px}
+
+.playlist-list{max-height:240px;overflow-y:auto}
+.pl-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;cursor:pointer;transition:background .15s}
+.pl-item:hover{background:var(--surface2)}
+.pl-item.selected{background:var(--surface2);outline:2px solid var(--accent)}
+.pl-item img{width:48px;height:48px;border-radius:6px;object-fit:cover;background:#222}
+.pl-info{flex:1;min-width:0}
+.pl-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-count{font-size:12px;color:var(--text2)}
+
+.player-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.player-row input{flex:1}
+.remove-player{background:none;border:none;color:var(--danger);cursor:pointer;font-size:20px;padding:4px 8px}
+
+.round-badge{display:inline-block;background:var(--surface2);padding:6px 16px;border-radius:50px;font-size:13px;color:var(--text2);font-weight:600}
+.playback-area{text-align:center;padding:24px 0}
+.play-btn{width:80px;height:80px;border-radius:50%;border:none;background:var(--accent);color:#000;font-size:32px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center}
+.play-btn:hover{transform:scale(1.1);background:var(--accent2)}
+.play-btn:disabled{opacity:.3;transform:none;cursor:not-allowed}
+.timer-bar{width:100%;height:6px;background:var(--surface2);border-radius:3px;margin-top:16px;overflow:hidden}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--accent),#6366f1);border-radius:3px;transition:width .1s linear;width:0}
+.timer-label{font-size:13px;color:var(--text2);margin-top:6px;text-align:center}
+
+.reveal-area{text-align:center;padding:16px 0;animation:fadeIn .4s ease}
+.reveal-area img{width:150px;height:150px;border-radius:12px;margin-bottom:12px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.reveal-title{font-size:20px;font-weight:700}
+.reveal-artist{font-size:16px;color:var(--text2)}
+.reveal-year{font-size:14px;color:var(--text2);margin-top:2px}
+
+.score-player{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;margin-bottom:6px;background:var(--surface2)}
+.score-player .name{font-weight:600;font-size:15px}
+.score-player .points{display:flex;gap:6px;align-items:center}
+.pts-btn{width:34px;height:34px;border-radius:8px;border:none;font-size:18px;font-weight:700;cursor:pointer;transition:all .15s}
+.pts-plus{background:var(--accent);color:#000}.pts-plus:hover{background:var(--accent2)}
+.pts-minus{background:#333;color:var(--text)}.pts-minus:hover{background:#444}
+.pts-value{min-width:30px;text-align:center;font-weight:700;font-size:16px}
+
+.sb-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border-radius:12px;margin-bottom:8px;border:1px solid #222244}
+.sb-item.rank-1{border-color:var(--gold);background:linear-gradient(135deg,var(--surface),#2a2500)}
+.sb-item.rank-2{border-color:var(--silver)}.sb-item.rank-3{border-color:var(--bronze)}
+.rank-icon{font-size:24px;width:36px;text-align:center}
+.sb-name{flex:1;font-weight:600;font-size:16px}
+.sb-score{font-size:20px;font-weight:700;color:var(--accent)}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+.toggle-row span{font-size:14px}
+.toggle-group{display:flex;gap:6px}
+.toggle-chip{padding:6px 12px;border-radius:8px;font-size:13px;border:1px solid #333;background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .15s}
+.toggle-chip.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.text-center{text-align:center}
+.section-label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.loading-spinner{display:inline-block;width:20px;height:20px;border:2px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.phase-dots{display:flex;justify-content:center;gap:6px;margin:12px 0}
+.phase-dot{width:8px;height:8px;border-radius:50%;background:#333;transition:all .3s}
+.phase-dot.active{background:var(--accent);width:24px;border-radius:4px}.phase-dot.done{background:var(--accent);opacity:.4}
+.hidden-info{filter:blur(20px);user-select:none;pointer-events:none;transition:filter .4s}
+.hidden-info.revealed{filter:none;user-select:auto;pointer-events:auto}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- LOGIN -->
+<div id="s-login" class="screen active">
+<div class="login-area">
+  <div class="logo">🎵</div>
+  <h1 style="font-size:28px;margin-bottom:4px;background:linear-gradient(135deg,var(--accent),#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Raad de Intro</h1>
+  <p style="color:var(--text2);margin-bottom:24px">Herken het nummer zo snel mogelijk!</p>
+  <button class="btn btn-primary" onclick="loginSpotify()" style="padding:14px 32px;font-size:16px">🎧 Inloggen met Spotify</button>
+  <p style="color:var(--text2);font-size:12px;margin-top:12px">Vereist Spotify Premium</p>
+</div>
+</div>
+
+<!-- SETUP -->
+<div id="s-setup" class="screen">
+<div class="flex-between" style="padding:16px 0 12px">
+  <h2 style="font-size:20px">Nieuw spel</h2>
+  <button class="btn btn-secondary btn-small" onclick="logout()">Uitloggen</button>
+</div>
+
+<div class="card">
+  <span class="section-label">Kies een playlist</span>
+  <div id="playlist-area"><div class="text-center" style="padding:20px"><div class="loading-spinner"></div></div></div>
+</div>
+
+<div class="card">
+  <span class="section-label">Spelers</span>
+  <div id="players-list"></div>
+  <button class="btn btn-secondary btn-small mt-8" onclick="addPlayer()">+ Speler toevoegen</button>
+</div>
+
+<div class="card">
+  <span class="section-label">Instellingen</span>
+  <div class="toggle-row">
+    <span>Wat raden?</span>
+  </div>
+  <div class="toggle-group mt-8" id="guess-toggles">
+    <div class="toggle-chip active" data-guess="title" onclick="toggleGuess(this)">Titel</div>
+    <div class="toggle-chip active" data-guess="artist" onclick="toggleGuess(this)">Artiest</div>
+    <div class="toggle-chip" data-guess="year" onclick="toggleGuess(this)">Jaartal</div>
+  </div>
+  <div class="toggle-row mt-12">
+    <span>Aantal rondes</span>
+    <div class="toggle-group">
+      <div class="toggle-chip" data-rounds="5" onclick="setRounds(this)">5</div>
+      <div class="toggle-chip active" data-rounds="10" onclick="setRounds(this)">10</div>
+      <div class="toggle-chip" data-rounds="15" onclick="setRounds(this)">15</div>
+      <div class="toggle-chip" data-rounds="20" onclick="setRounds(this)">20</div>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-primary" style="width:100%;margin-top:8px" id="start-btn" onclick="startGame()" disabled>▶ Start spel</button>
+</div>
+
+<!-- GAME -->
+<div id="s-game" class="screen">
+<div class="flex-between">
+  <div id="round-badge" class="round-badge">Ronde 1/10</div>
+  <button class="btn btn-secondary btn-small" onclick="endGame()">Stop spel</button>
+</div>
+
+<div class="phase-dots mt-12" id="phase-dots">
+  <div class="phase-dot active"></div>
+  <div class="phase-dot"></div>
+  <div class="phase-dot"></div>
+  <div class="phase-dot"></div>
+</div>
+
+<div class="card mt-8">
+  <div class="playback-area">
+    <div id="play-status" style="font-size:14px;color:var(--text2);margin-bottom:12px">Druk op play om te luisteren</div>
+    <button class="play-btn" id="play-btn" onclick="handlePlay()">▶</button>
+    <div class="timer-bar mt-16"><div class="timer-fill" id="timer-fill"></div></div>
+    <div class="timer-label" id="timer-label">Klaar om te spelen</div>
+  </div>
+</div>
+
+<div id="reveal-container" style="display:none">
+  <div class="card">
+    <div class="reveal-area">
+      <img id="reveal-img" src="" alt="">
+      <div class="reveal-title" id="reveal-title">—</div>
+      <div class="reveal-artist" id="reveal-artist">—</div>
+      <div class="reveal-year" id="reveal-year"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="scoring-card">
+  <span class="section-label">Punten deze ronde</span>
+  <div id="scoring-area"></div>
+</div>
+
+<div class="text-center mt-8" id="game-actions">
+  <button class="btn btn-primary" id="reveal-btn" onclick="revealTrack()" style="display:none">👁 Onthul het nummer</button>
+  <button class="btn btn-primary" id="next-btn" onclick="nextRound()" style="display:none">Volgende ronde →</button>
+  <button class="btn btn-primary" id="finish-btn" onclick="showResults()" style="display:none">🏆 Bekijk resultaten</button>
+</div>
+</div>
+
+<!-- RESULTS -->
+<div id="s-results" class="screen">
+<div class="text-center" style="padding:24px 0">
+  <div style="font-size:48px;margin-bottom:8px">🏆</div>
+  <h2 style="font-size:24px">Eindstand</h2>
+</div>
+<div id="results-list"></div>
+<div class="text-center mt-16">
+  <button class="btn btn-primary" onclick="showScreen('s-setup')" style="padding:14px 32px">🔄 Nieuw spel</button>
+</div>
+</div>
+
+</div>
+
+<script>
+// ===== CONFIG =====
+// BELANGRIJK: Vul hier je eigen Spotify Client ID in!
+// Maak een app op https://developer.spotify.com/dashboard
+// en stel als redirect URI in: de URL waar deze pagina draait
+const CLIENT_ID = '74323406b50546ecb04df51d359b5e56';
+const REDIRECT_URI = window.location.origin + window.location.pathname;
+const SCOPES = 'streaming user-read-email user-read-private user-library-read playlist-read-private playlist-read-collaborative';
+
+// ===== STATE =====
+let accessToken = null;
+let player = null;
+let deviceId = null;
+let playlists = [];
+let selectedPlaylist = null;
+let players = [];
+let scores = {};
+let roundScores = {};
+let guessTypes = new Set(['title','artist']);
+let totalRounds = 10;
+let currentRound = 0;
+let tracks = [];
+let currentTrack = null;
+let playPhase = 0; // 0=ready, 1=snippet1, 2=paused, 3=snippet2, 4=done
+let playTimer = null;
+let timerStart = 0;
+let revealed = false;
+
+// ===== AUTH (PKCE) =====
+function generateRandom(len) {
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2,'0')).join('').slice(0, len);
+}
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+async function loginSpotify() {
+  const verifier = generateRandom(64);
+  const challenge = await generateCodeChallenge(verifier);
+  sessionStorage.setItem('pkce_verifier', verifier);
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    response_type: 'code',
+    redirect_uri: REDIRECT_URI,
+    scope: SCOPES,
+    code_challenge_method: 'S256',
+    code_challenge: challenge
+  });
+  window.location = 'https://accounts.spotify.com/authorize?' + params;
+}
+
+async function handleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (!code) return false;
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  if (!verifier) return false;
+
+  const resp = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({
+      client_id: CLIENT_ID,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI,
+      code_verifier: verifier
+    })
+  });
+  const data = await resp.json();
+  if (data.access_token) {
+    accessToken = data.access_token;
+    sessionStorage.setItem('spotify_token', accessToken);
+    if (data.refresh_token) sessionStorage.setItem('spotify_refresh', data.refresh_token);
+    window.history.replaceState({}, '', REDIRECT_URI);
+    return true;
+  }
+  return false;
+}
+
+async function refreshToken() {
+  const rt = sessionStorage.getItem('spotify_refresh');
+  if (!rt) return false;
+  const resp = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({
+      client_id: CLIENT_ID,
+      grant_type: 'refresh_token',
+      refresh_token: rt
+    })
+  });
+  const data = await resp.json();
+  if (data.access_token) {
+    accessToken = data.access_token;
+    sessionStorage.setItem('spotify_token', accessToken);
+    if (data.refresh_token) sessionStorage.setItem('spotify_refresh', data.refresh_token);
+    return true;
+  }
+  return false;
+}
+
+function logout() {
+  accessToken = null;
+  sessionStorage.clear();
+  if (player) { player.disconnect(); player = null; }
+  showScreen('s-login');
+}
+
+// ===== SPOTIFY API =====
+async function api(path) {
+  let resp = await fetch('https://api.spotify.com/v1' + path, {
+    headers: {'Authorization': 'Bearer ' + accessToken}
+  });
+  if (resp.status === 401) {
+    if (await refreshToken()) {
+      resp = await fetch('https://api.spotify.com/v1' + path, {
+        headers: {'Authorization': 'Bearer ' + accessToken}
+      });
+    }
+  }
+  return resp.json();
+}
+
+async function apiPut(path, body) {
+  await fetch('https://api.spotify.com/v1' + path, {
+    method: 'PUT',
+    headers: {'Authorization': 'Bearer ' + accessToken, 'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+}
+
+// ===== PLAYBACK SDK =====
+function loadSDK() {
+  return new Promise(resolve => {
+    if (window.Spotify) return resolve();
+    window.onSpotifyWebPlaybackSDKReady = resolve;
+    const s = document.createElement('script');
+    s.src = 'https://sdk.scdn.co/spotify-player.js';
+    document.head.appendChild(s);
+  });
+}
+
+async function initPlayer() {
+  await loadSDK();
+  player = new Spotify.Player({
+    name: 'Raad de Intro',
+    getOAuthToken: cb => cb(accessToken),
+    volume: 0.8
+  });
+  player.addListener('ready', ({device_id}) => {
+    deviceId = device_id;
+    console.log('Player ready:', device_id);
+  });
+  player.addListener('not_ready', () => console.log('Player not ready'));
+  player.addListener('initialization_error', e => console.error(e));
+  player.addListener('authentication_error', async e => {
+    console.error('Auth error', e);
+    if (await refreshToken()) {
+      player.disconnect();
+      initPlayer();
+    }
+  });
+  await player.connect();
+}
+
+// ===== SCREENS =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== PLAYLISTS =====
+async function loadPlaylists() {
+  const area = document.getElementById('playlist-area');
+  let all = [];
+  let url = '/me/playlists?limit=50';
+  while (url) {
+    const data = await api(url);
+    all = all.concat(data.items || []);
+    url = data.next ? data.next.replace('https://api.spotify.com/v1','') : null;
+  }
+  playlists = all;
+  if (!all.length) {
+    area.innerHTML = '<p style="color:var(--text2);font-size:14px;padding:12px">Geen playlists gevonden.</p>';
+    return;
+  }
+  area.innerHTML = '<div class="playlist-list">' + all.map((p, i) =>
+    `<div class="pl-item" data-idx="${i}" onclick="selectPlaylist(${i})">
+      <img src="${p.images && p.images[0] ? p.images[0].url : ''}" alt="">
+      <div class="pl-info">
+        <div class="pl-name">${esc(p.name)}</div>
+        <div class="pl-count">${p.tracks.total} nummers</div>
+      </div>
+    </div>`
+  ).join('') + '</div>';
+}
+
+function selectPlaylist(idx) {
+  selectedPlaylist = playlists[idx];
+  document.querySelectorAll('.pl-item').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.pl-item[data-idx="${idx}"]`).classList.add('selected');
+  updateStartBtn();
+}
+
+// ===== PLAYERS =====
+function initPlayers() {
+  players = ['Speler 1','Speler 2'];
+  renderPlayers();
+}
+function renderPlayers() {
+  const el = document.getElementById('players-list');
+  el.innerHTML = players.map((name, i) =>
+    `<div class="player-row">
+      <input type="text" value="${esc(name)}" onchange="players[${i}]=this.value" placeholder="Naam">
+      ${players.length > 1 ? `<button class="remove-player" onclick="removePlayer(${i})">×</button>` : ''}
+    </div>`
+  ).join('');
+  updateStartBtn();
+}
+function addPlayer() { players.push('Speler ' + (players.length + 1)); renderPlayers(); }
+function removePlayer(i) { players.splice(i, 1); renderPlayers(); }
+
+// ===== SETTINGS =====
+function toggleGuess(el) {
+  const g = el.dataset.guess;
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) guessTypes.add(g); else guessTypes.delete(g);
+}
+function setRounds(el) {
+  document.querySelectorAll('[data-rounds]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  totalRounds = parseInt(el.dataset.rounds);
+}
+function updateStartBtn() {
+  document.getElementById('start-btn').disabled = !(selectedPlaylist && players.length >= 1);
+}
+
+// ===== GAME =====
+async function startGame() {
+  // Sync player names from inputs
+  document.querySelectorAll('#players-list input').forEach((inp, i) => { players[i] = inp.value || ('Speler ' + (i+1)); });
+  scores = {};
+  players.forEach(p => scores[p] = 0);
+  currentRound = 0;
+
+  // Load tracks
+  const allTracks = [];
+  let url = `/playlists/${selectedPlaylist.id}/tracks?limit=100&fields=items(track(id,name,uri,artists,album(images,release_date)))`;
+  while (url) {
+    const data = await api(url);
+    (data.items || []).forEach(i => { if (i.track && i.track.id) allTracks.push(i.track); });
+    url = data.next ? data.next.replace('https://api.spotify.com/v1','') : null;
+  }
+
+  // Shuffle and pick
+  for (let i = allTracks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allTracks[i], allTracks[j]] = [allTracks[j], allTracks[i]];
+  }
+  tracks = allTracks.slice(0, totalRounds);
+  if (tracks.length < totalRounds) totalRounds = tracks.length;
+  if (!tracks.length) { alert('Niet genoeg nummers in deze playlist!'); return; }
+
+  showScreen('s-game');
+  nextRound();
+}
+
+function nextRound() {
+  if (currentRound >= totalRounds) { showResults(); return; }
+  currentTrack = tracks[currentRound];
+  currentRound++;
+  playPhase = 0;
+  revealed = false;
+  roundScores = {};
+  players.forEach(p => roundScores[p] = 0);
+
+  document.getElementById('round-badge').textContent = `Ronde ${currentRound}/${totalRounds}`;
+  document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').disabled = false;
+  document.getElementById('play-status').textContent = 'Druk op play om te luisteren';
+  document.getElementById('timer-fill').style.width = '0%';
+  document.getElementById('timer-label').textContent = 'Klaar om te spelen';
+  document.getElementById('reveal-container').style.display = 'none';
+  document.getElementById('reveal-btn').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('finish-btn').style.display = 'none';
+
+  updatePhaseDots();
+  renderScoring();
+}
+
+function updatePhaseDots() {
+  const dots = document.querySelectorAll('#phase-dots .phase-dot');
+  dots.forEach((d, i) => {
+    d.className = 'phase-dot';
+    if (i < playPhase) d.classList.add('done');
+    else if (i === playPhase) d.classList.add('active');
+  });
+}
+
+async function handlePlay() {
+  const btn = document.getElementById('play-btn');
+
+  if (playPhase === 0) {
+    // Phase 1: play 1 second
+    btn.disabled = true;
+    btn.textContent = '⏸';
+    document.getElementById('play-status').textContent = 'Luister goed...';
+    await playTrack(currentTrack.uri);
+    startTimer(1000, () => {
+      pauseTrack();
+      playPhase = 1;
+      btn.textContent = '▶';
+      btn.disabled = false;
+      document.getElementById('play-status').textContent = 'Weet iemand het? Zo niet, druk nogmaals op play';
+      document.getElementById('timer-label').textContent = '1 seconde gehoord';
+      document.getElementById('reveal-btn').style.display = 'inline-flex';
+      updatePhaseDots();
+    });
+  } else if (playPhase === 1) {
+    // Phase 2: play 3 more seconds (total 4s)
+    btn.disabled = true;
+    btn.textContent = '⏸';
+    document.getElementById('play-status').textContent = 'Nog een stukje...';
+    await resumeTrack();
+    startTimer(3000, () => {
+      pauseTrack();
+      playPhase = 2;
+      btn.textContent = '▶';
+      btn.disabled = false;
+      document.getElementById('play-status').textContent = 'Nog steeds niet? Druk nogmaals';
+      document.getElementById('timer-label').textContent = '4 seconden gehoord';
+      updatePhaseDots();
+    });
+  } else if (playPhase === 2) {
+    // Phase 3: play 6 more seconds (total 10s)
+    btn.disabled = true;
+    btn.textContent = '⏸';
+    document.getElementById('play-status').textContent = 'Laatste kans...';
+    await resumeTrack();
+    startTimer(6000, () => {
+      pauseTrack();
+      playPhase = 3;
+      btn.textContent = '🔁';
+      btn.disabled = false;
+      document.getElementById('play-status').textContent = 'Klaar! Onthul het nummer of speel opnieuw af';
+      document.getElementById('timer-label').textContent = '10 seconden gehoord';
+      updatePhaseDots();
+    });
+  } else if (playPhase === 3) {
+    // Replay the full 10s
+    btn.disabled = true;
+    document.getElementById('play-status').textContent = 'Opnieuw afspelen...';
+    await playTrackFrom(currentTrack.uri, 0);
+    startTimer(10000, () => {
+      pauseTrack();
+      btn.disabled = false;
+      document.getElementById('play-status').textContent = 'Onthul het nummer!';
+    });
+  }
+}
+
+function startTimer(duration, onComplete) {
+  const fill = document.getElementById('timer-fill');
+  const label = document.getElementById('timer-label');
+  timerStart = Date.now();
+  clearInterval(playTimer);
+  playTimer = setInterval(() => {
+    const elapsed = Date.now() - timerStart;
+    const pct = Math.min(100, (elapsed / duration) * 100);
+    fill.style.width = pct + '%';
+    label.textContent = (elapsed / 1000).toFixed(1) + 's';
+    if (elapsed >= duration) {
+      clearInterval(playTimer);
+      fill.style.width = '100%';
+      onComplete();
+    }
+  }, 50);
+}
+
+async function playTrack(uri) {
+  await apiPut(`/me/player/play?device_id=${deviceId}`, { uris: [uri], position_ms: 0 });
+}
+async function playTrackFrom(uri, pos) {
+  await apiPut(`/me/player/play?device_id=${deviceId}`, { uris: [uri], position_ms: pos });
+}
+async function pauseTrack() {
+  try { await player.pause(); } catch(e) { console.error(e); }
+}
+async function resumeTrack() {
+  try { await player.resume(); } catch(e) { console.error(e); }
+}
+
+// ===== REVEAL (host-blind) =====
+function revealTrack() {
+  revealed = true;
+  const t = currentTrack;
+  const img = t.album && t.album.images && t.album.images[0] ? t.album.images[0].url : '';
+  const year = t.album && t.album.release_date ? t.album.release_date.substring(0, 4) : '';
+  const artists = t.artists ? t.artists.map(a => a.name).join(', ') : '?';
+
+  document.getElementById('reveal-img').src = img;
+  document.getElementById('reveal-title').textContent = t.name;
+  document.getElementById('reveal-artist').textContent = artists;
+  document.getElementById('reveal-year').textContent = year;
+  document.getElementById('reveal-container').style.display = 'block';
+  document.getElementById('reveal-btn').style.display = 'none';
+
+  if (currentRound >= totalRounds) {
+    document.getElementById('finish-btn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('next-btn').style.display = 'inline-flex';
+  }
+}
+
+// ===== SCORING =====
+function renderScoring() {
+  const el = document.getElementById('scoring-area');
+  el.innerHTML = players.map((p, i) =>
+    `<div class="score-player">
+      <span class="name">${esc(p)} <span style="color:var(--text2);font-weight:400;font-size:13px">(${scores[p]} totaal)</span></span>
+      <div class="points">
+        <button class="pts-btn pts-minus" onclick="adjustScore(${i},-1)">−</button>
+        <span class="pts-value" id="pts-${i}">${roundScores[p]}</span>
+        <button class="pts-btn pts-plus" onclick="adjustScore(${i},1)">+</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function adjustScore(idx, delta) {
+  const p = players[idx];
+  roundScores[p] = Math.max(0, (roundScores[p] || 0) + delta);
+  scores[p] = (scores[p] || 0) + delta;
+  if (scores[p] < 0) scores[p] = 0;
+  document.getElementById('pts-' + idx).textContent = roundScores[p];
+  renderScoring();
+}
+
+// ===== RESULTS =====
+function showResults() {
+  pauseTrack();
+  clearInterval(playTimer);
+  const sorted = [...players].sort((a, b) => scores[b] - scores[a]);
+  const medals = ['🥇','🥈','🥉'];
+  const el = document.getElementById('results-list');
+  el.innerHTML = sorted.map((p, i) =>
+    `<div class="sb-item ${i < 3 ? 'rank-' + (i+1) : ''}">
+      <div class="rank-icon">${medals[i] || (i+1)}</div>
+      <div class="sb-name">${esc(p)}</div>
+      <div class="sb-score">${scores[p]} pt</div>
+    </div>`
+  ).join('');
+  showScreen('s-results');
+}
+
+function endGame() {
+  if (confirm('Weet je zeker dat je het spel wilt stoppen?')) {
+    pauseTrack();
+    clearInterval(playTimer);
+    showResults();
+  }
+}
+
+// ===== UTILS =====
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ===== INIT =====
+async function init() {
+  // Check callback
+  if (window.location.search.includes('code=')) {
+    const ok = await handleCallback();
+    if (ok) {
+      await initPlayer();
+      showScreen('s-setup');
+      initPlayers();
+      loadPlaylists();
+      return;
+    }
+  }
+  // Check existing token
+  const stored = sessionStorage.getItem('spotify_token');
+  if (stored) {
+    accessToken = stored;
+    // Verify token works
+    const me = await api('/me');
+    if (me.id) {
+      await initPlayer();
+      showScreen('s-setup');
+      initPlayers();
+      loadPlaylists();
+      return;
+    }
+    // Try refresh
+    if (await refreshToken()) {
+      await initPlayer();
+      showScreen('s-setup');
+      initPlayers();
+      loadPlaylists();
+      return;
+    }
+  }
+  showScreen('s-login');
+}
+
+init();
+</script>
+</body>
+</html>
