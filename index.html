@@ -457,9 +457,10 @@ async function startGame() {
 
   // Load tracks
   const allTracks = [];
-  let url = `/playlists/${selectedPlaylist.id}/tracks?limit=100&fields=items(track(id,name,uri,artists,album(images,release_date)))`;
+  let url = `/playlists/${selectedPlaylist.id}/tracks?limit=100`;
   while (url) {
     const data = await api(url);
+    if (data.error) { alert('Fout bij laden van playlist: ' + (data.error.message || data.error.status)); return; }
     (data.items || []).forEach(i => { if (i.track && i.track.id) allTracks.push(i.track); });
     url = data.next ? data.next.replace('https://api.spotify.com/v1','') : null;
   }
