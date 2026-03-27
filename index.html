@@ -460,7 +460,17 @@ async function startGame() {
   let url = `/playlists/${selectedPlaylist.id}/tracks?limit=100`;
   while (url) {
     const data = await api(url);
-
+    if (data.error) {
+      if (data.error.status === 403 || data.error.status === 401) {
+        sessionStorage.removeItem('spotify_token');
+        sessionStorage.removeItem('spotify_refresh');
+        alert('Je Spotify-sessie heeft niet de juiste rechten. Je wordt opnieuw ingelogd.');
+        await loginSpotify();
+        return;
+      }
+      alert('Fout bij laden van playlist (' + data.error.status + '): ' + data.error.message);
+      return;
+    }
     (data.items || []).forEach(i => { if (i.track && i.track.id) allTracks.push(i.track); });
     url = data.next ? data.next.replace('https://api.spotify.com/v1','') : null;
   }
